@@ -3,16 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 )
 
 type server struct {
 	addr string
-
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// w.Write([]byte("Hello from the server"))
-	switch r.Method{
+	switch r.Method {
 	case "GET":
 		switch r.URL.Path {
 		case "/":
@@ -29,9 +28,14 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	s := &server{addr: ":8080"}
-	if err := http.ListenAndServe(s.addr, s); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // fallback for local dev
+	}
+	s := &server{}
+	addr := ":" + port
+	log.Println("Starting server on", addr)
+	if err := http.ListenAndServe(addr, s); err != nil {
 		log.Fatal(err)
 	}
-	http.ListenAndServe(s.addr, s)
 }
